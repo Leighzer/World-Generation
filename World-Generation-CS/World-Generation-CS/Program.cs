@@ -4,7 +4,9 @@
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            WorldGeneration w = new WorldGeneration();
+
+            w.setup();
         }
     }
 }

@@ -1,0 +1,43 @@
+﻿using SixLabors.ImageSharp;
+
+namespace World_Generation_CS
+{
+    // util file that provides similar functionality to processing shared functions
+    // temporary
+    public static class SharedUtils
+    {
+        public static float random(float input)
+        {
+            Random random = new Random();
+            return (float)(random.NextDouble() * input);
+        }
+
+        public static Color color(int r, int g, int b)
+        {
+            return Color.FromRgb((byte)r, (byte)g, (byte)b);
+        }
+
+        public static float dist(float x1, float y1, float x2, float y2)
+        {
+            float dist = (float)Math.Sqrt(Math.Pow((x2 - x1), 2) + Math.Pow((y2 - y1), 2));
+            return dist;
+        }
+
+        public static bool randomBool()
+        {
+            return random(1) > 0.5;
+        }
+
+        public static int randomSign()
+        {
+            if (randomBool())
+            {
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+    }
+}

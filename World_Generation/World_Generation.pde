@@ -12,7 +12,7 @@ import toxi.math.noise.SimplexNoise;
   
 void setup(){
   //size(1000,600);
-  fullScreen();
+  //fullScreen();
   numberOfRows = floor(width / plotSize);
   numberOfColumns = floor(height / plotSize);
   plots = new Plot[numberOfRows][numberOfColumns];  

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing;
+using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 // import toxi.math.noise.SimplexNoise;
 
@@ -18,17 +18,12 @@ namespace World_Generation_CS
         Center[] centers;
         int numberOfCenters = 2500;
 
-        double width = 640;
-        double height = 360;
+        const float width = 640;
+        const float height = 360;
 
-        // double noise = SimplexNoise.noise(random(Float.MAX_VALUE), random(Float.MAX_VALUE));
+        Image<Rgba32> image = new Image<Rgba32>((int)width, (int)height);
 
-        private double random(double input)
-        {
-            return 1;
-        }
-
-        void setup()
+        public void setup()
         {
             numberOfRows = (int)Math.Floor(width / plotSize);
             numberOfColumns = (int)Math.Floor(height / plotSize);
@@ -52,7 +47,7 @@ namespace World_Generation_CS
             {
                 for (int j = 0; j < numberOfColumns; j++)
                 {
-                    plots[i][j] = new Plot(new Vector2(plotSize * i, plotSize * j), plotSize, color(0, 0, 0));
+                    plots[i][j] = new Plot(new Vector2(plotSize * i, plotSize * j), plotSize, SharedUtils.color(0, 0, 0));
                 }
             }
         }
@@ -61,7 +56,7 @@ namespace World_Generation_CS
         {
             for (int i = 0; i < centers.Length; i++)
             {
-                centers[i] = new Center(new Vector2(random(width), random(height)), randomBool(), getBiasedWarmLand());
+                centers[i] = new Center(new Vector2(SharedUtils.random(width), SharedUtils.random(height)), SharedUtils.randomBool(), getBiasedWarmLand());
             }
 
             for (int i = 0; i < centers.Length; i++)
@@ -83,17 +78,17 @@ namespace World_Generation_CS
 
         void updatePlot(Plot p)
         {
-            float dist, closestDist;
+            float distance, closestDist;
 
             Center centerToUse;
             centerToUse = centers[0];
-            closestDist = dist(p.pos.X, p.pos.Y, centers[0].pos.X, centers[0].pos.Y);
+            closestDist = SharedUtils.dist(p.pos.X, p.pos.Y, centers[0].pos.X, centers[0].pos.Y);
             for (int i = 1; i < centers.Length; i++)
             {
-                dist = dist(p.pos.X, p.pos.Y, centers[i].pos.X, centers[i].pos.Y);
-                if (dist < closestDist)
+                distance = SharedUtils.dist(p.pos.X, p.pos.Y, centers[i].pos.X, centers[i].pos.Y);
+                if (distance < closestDist)
                 {
-                    closestDist = dist;
+                    closestDist = distance;
                     centerToUse = centers[i];
                 }
             }
@@ -112,98 +107,49 @@ namespace World_Generation_CS
             }
         }
 
-        void smoothLand(int a, int b)
-        {
-            if (green(color(plots[a][b].c)) == green((color(165, 255, 42))))
-            {
-                stroke(255, 0, 255);
-                strokeWeight(50);
-                point(plots[a][b].pos.X, plots[a][b].pos.Y);
-                float numberOfAdjacentLands = 0;
-
-                if (green(plots[a + 1][b].c) == green((color(165, 255, 42))))
-                {
-                    numberOfAdjacentLands += 1;
-                }
-                if (green(color(plots[a - 1][b].c)) == green(color(165, 255, 42)))
-                {
-                    numberOfAdjacentLands += 1;
-                }
-                if (green(color(plots[a][b + 1].c)) == green((color(165, 255, 42))))
-                {
-                    numberOfAdjacentLands += 1;
-                }
-                if (green(color(plots[a][b - 1].c)) == green((color(165, 255, 42))))
-                {
-                    numberOfAdjacentLands += 1;
-                }
-
-                if (numberOfAdjacentLands < 1)
-                {
-                    plots[a][b].c = color(132, 112, 255);
-                }
-
-                Console.WriteLine("Color: " + color(plots[a][b].c) + " Number Of Adjacent Lands: " + numberOfAdjacentLands);
-            }
-        }
-
-        void smoothLands()
-        {
-            for (int i = 1; i < numberOfRows - 1; i++)
-            {
-                for (int j = 1; j < numberOfColumns - 1; j++)
-                {
-                    smoothLand(i, j);
-                }
-            }
-        }
-
-        //void keyPressed()
-        //{
-        //    if (key == ' ')
-        //    {
-        //        exit();
-        //    }
-        //    else if (key == 'r')
-        //    {
-        //        saveFrame();
-        //    }
-        //    initCenters();
-        //    updatePlots();
-        //    drawPlots();
-        //}
-
         void drawPlots()
         {
             for (int i = 0; i < numberOfRows; i++)
             {
                 for (int j = 0; j < numberOfColumns; j++)
                 {
-                    plots[i][j].show();
+                    renderPlot(plots[i][j]);
                 }
             }
         }
 
-        bool randomBool()
+        void renderPlot(Plot p)
         {
-            return random(1) > 0.5;
+            // render the plot bkd
+            image.Mutate(context => context.Fill(p.c, new Rectangle((int)p.pos.X, (int)p.pos.Y, p.size, p.size)));
+
+            // if the plot has a structure
+            if (p.s != null)
+            {
+                // render the structure
+                // render p.s
+                renderStructure(p.s);
+            }
         }
 
-        int randomSign()
+        void renderStructure(Structure s)
         {
-            if (random(1) > 0.5)
+            var p = s.p;
+
+            if (s.type == BuildingType.TREE)
             {
-                return 1;
+                image.Mutate(context => context.Fill(SharedUtils.color(139, 69, 19), new Rectangle((int)p.pos.X, (int)p.pos.Y, p.size, p.size)));
+                image.Mutate(context => context.Fill(SharedUtils.color(139, 69, 19), new EllipsePolygon(new Point((int)p.pos.X, (int)p.pos.Y), p.size)));
             }
-            else
+            else if (s.type == BuildingType.SNOW)
             {
-                return -1;
+
             }
         }
 
         Biome getRandomBiome()
         {
-            int randomVal = (int)Math.Floor(random(4.9999));
+            int randomVal = (int)Math.Floor(SharedUtils.random(4.9999f));
             if (randomVal == 0)
             {
                 return Biome.FOREST;
@@ -228,7 +174,7 @@ namespace World_Generation_CS
 
         Biome getRandomNotTundra()
         {
-            int randomVal = (int)Math.Floor(random(4.9999));
+            int randomVal = (int)Math.Floor(SharedUtils.random(4.9999f));
             if (randomVal == 0)
             {
                 return Biome.FOREST;
@@ -249,7 +195,7 @@ namespace World_Generation_CS
 
         Biome getRandomNotTundraOcean()
         {
-            int randomVal = (int)Math.Floor(random(2.9999));
+            int randomVal = (int)Math.Floor(SharedUtils.random(2.9999f));
             if (randomVal == 0)
             {
                 return Biome.FOREST;
@@ -266,7 +212,7 @@ namespace World_Generation_CS
 
         Biome getBiasedWarmLand()
         {
-            int randomVal = (int)Math.Floor(random(3.4999));
+            int randomVal = (int)Math.Floor(SharedUtils.random(3.4999f));
             if (randomVal == 0)
             {
                 return Biome.FOREST;
@@ -285,9 +231,10 @@ namespace World_Generation_CS
             }
         }
 
-        void draw()
+        public Image render()
         {
-
+            // TODO return image
+            return null;
         }
     }
 }
