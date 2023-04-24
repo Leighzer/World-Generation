@@ -16,14 +16,14 @@ namespace World_Generation_CS
         public int NumberOfColumns;
         public Plot[][] Plots;
         public Center[] Centers;
-        public int NumberOfCenters = 2500;
+        public int NumberOfCenters = 2000;
 
-        public const float Width = 640;
-        public const float Height = 360;
+        public const float Width = 1920;
+        public const float Height = 1080;
 
-        public Image<Rgba32> Image = new Image<Rgba32>((int)Width, (int)Height);
+        private Image<Rgba32> _image = new Image<Rgba32>((int)Width, (int)Height);
 
-        public void Setup()
+        private void Setup()
         {
             NumberOfRows = (int)Math.Floor(Width / PlotSize);
             NumberOfColumns = (int)Math.Floor(Height / PlotSize);
@@ -121,7 +121,7 @@ namespace World_Generation_CS
         private void RenderPlot(Plot p)
         {
             // render the plot bkd
-            Image.Mutate(context => context.Fill(p.Color, new Rectangle((int)p.Position.X, (int)p.Position.Y, p.Size, p.Size)));
+            _image.Mutate(context => context.Fill(p.Color, new Rectangle((int)p.Position.X, (int)p.Position.Y, p.Size, p.Size)));
 
             // if the plot has a structure
             if (p.Structure != null)
@@ -132,18 +132,26 @@ namespace World_Generation_CS
             }
         }
 
-        private void RenderStructure(Structure s)
+        private void RenderStructure(Structure structure)
         {
-            var p = s.Plot;
+            var plot = structure.Plot;
 
-            if (s.BuildingType == BuildingType.TREE)
+            if (structure.BuildingType == BuildingType.TREE)
             {
-                Image.Mutate(context => context.Fill(SharedUtils.Color(139, 69, 19), new Rectangle((int)p.Position.X, (int)p.Position.Y, p.Size, p.Size)));
-                Image.Mutate(context => context.Fill(SharedUtils.Color(139, 69, 19), new EllipsePolygon(new Point((int)p.Position.X, (int)p.Position.Y), p.Size)));
+                _image.Mutate(context => context.Fill(SharedUtils.Color(139, 69, 19), new Rectangle((int)plot.Position.X, (int)plot.Position.Y, plot.Size, plot.Size)));
+                _image.Mutate(context => context.Fill(SharedUtils.Color(77, 255, 58), new EllipsePolygon(new Point((int)plot.Position.X + (plot.Size / 2), (int)plot.Position.Y + (plot.Size / 2)), plot.Size / 2)));
             }
-            else if (s.BuildingType == BuildingType.SNOW)
+            else if (structure.BuildingType == BuildingType.SNOW)
             {
-
+                for (int i = 0; i < plot.Size; i++)
+                {
+                    for (int j = 0; j < plot.Size; j++)
+                    {
+                        int tx = (int)plot.Position.X + i;
+                        int ty = (int)plot.Position.Y + j;
+                        _image[tx, ty] = SharedUtils.RandomBool() ? Color.White : plot.Color;
+                    }
+                }
             }
         }
 
@@ -233,7 +241,8 @@ namespace World_Generation_CS
 
         public Image Render()
         {
-            return Image;
+            Setup();
+            return _image;
         }
     }
 }

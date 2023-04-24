@@ -22,9 +22,12 @@ namespace World_Generation_CS
             //d = 1/d; 
             this.Structure = null;
 
+            int coreDist0 = 20;
+            int coreDist1 = 40;
+
             if (centerToUse.Biome == Biome.PLAINS)
             {
-                if (distance < 32)
+                if (distance < coreDist1)
                 {
                     Color = SharedUtils.Color(153, 255, 51);
                 }
@@ -37,11 +40,11 @@ namespace World_Generation_CS
             if (centerToUse.Biome == Biome.TUNDRA)
             {
 
-                if (distance < 16)
+                if (distance < coreDist0)
                 {
                     Color = SharedUtils.Color(255, 255, 255);
                 }
-                else if (distance < 32)
+                else if (distance < coreDist1)
                 {
                     Color = SharedUtils.Color(102, 178, 255);
                     this.Structure = new Structure(BuildingType.SNOW, this);
@@ -55,7 +58,7 @@ namespace World_Generation_CS
 
             if (centerToUse.Biome == Biome.FOREST)
             {
-                if (distance < 32)
+                if (distance < coreDist1)
                 {
                     Color = SharedUtils.Color(0, 133, 0);
                 }
@@ -63,6 +66,7 @@ namespace World_Generation_CS
                 {
                     Color = SharedUtils.Color(0, 155, 0);
                 }
+
                 if (SharedUtils.Random(1) > 0.5)
                 {
                     this.Structure = new Structure(BuildingType.TREE, this);
@@ -76,7 +80,7 @@ namespace World_Generation_CS
 
             if (centerToUse.Biome == Biome.DESERT)
             {
-                if (distance < 32)
+                if (distance < coreDist1)
                 {
                     Color = SharedUtils.Color(200, 180, 71);
                 }

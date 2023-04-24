@@ -8,10 +8,12 @@ namespace World_Generation_CS
         {
             WorldGeneration worldGeneration = new WorldGeneration();
 
-            worldGeneration.Setup();
+            Image image = worldGeneration.Render();
+            string filePath = "./" + Path.GetRandomFileName().Replace(".", "") + ".png";
+            image.SaveAsPng(filePath);
 
-            Image worldImage = worldGeneration.Render();
-
+            Console.WriteLine(Path.GetFullPath(filePath));
+            Console.WriteLine("DONE");
         }
     }
 }
