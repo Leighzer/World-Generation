@@ -2,13 +2,13 @@
 {
     public class Structure
     {
-        public BuildingType type;
-        public Plot p;
+        public BuildingType BuildingType;
+        public Plot Plot;
 
         public Structure(BuildingType type, Plot p)
         {
-            this.type = type;
-            this.p = p;
+            this.BuildingType = type;
+            this.Plot = p;
         }
     }
 }

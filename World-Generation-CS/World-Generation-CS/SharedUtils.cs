@@ -6,31 +6,31 @@ namespace World_Generation_CS
     // temporary
     public static class SharedUtils
     {
-        public static float random(float input)
+        public static float Random(float input)
         {
             Random random = new Random();
             return (float)(random.NextDouble() * input);
         }
 
-        public static Color color(int r, int g, int b)
+        public static Color Color(int r, int g, int b)
         {
-            return Color.FromRgb((byte)r, (byte)g, (byte)b);
+            return SixLabors.ImageSharp.Color.FromRgb((byte)r, (byte)g, (byte)b);
         }
 
-        public static float dist(float x1, float y1, float x2, float y2)
+        public static float Distance(float x1, float y1, float x2, float y2)
         {
             float dist = (float)Math.Sqrt(Math.Pow((x2 - x1), 2) + Math.Pow((y2 - y1), 2));
             return dist;
         }
 
-        public static bool randomBool()
+        public static bool RandomBool()
         {
-            return random(1) > 0.5;
+            return Random(1) > 0.5;
         }
 
-        public static int randomSign()
+        public static int RandomSign()
         {
-            if (randomBool())
+            if (RandomBool())
             {
                 return 1;
             }

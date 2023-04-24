@@ -47,7 +47,7 @@ namespace World_Generation_CS
             {
                 for (int j = 0; j < numberOfColumns; j++)
                 {
-                    plots[i][j] = new Plot(new Vector2(plotSize * i, plotSize * j), plotSize, SharedUtils.color(0, 0, 0));
+                    plots[i][j] = new Plot(new Vector2(plotSize * i, plotSize * j), plotSize, SharedUtils.Color(0, 0, 0));
                 }
             }
         }
@@ -56,21 +56,21 @@ namespace World_Generation_CS
         {
             for (int i = 0; i < centers.Length; i++)
             {
-                centers[i] = new Center(new Vector2(SharedUtils.random(width), SharedUtils.random(height)), SharedUtils.randomBool(), getBiasedWarmLand());
+                centers[i] = new Center(new Vector2(SharedUtils.Random(width), SharedUtils.Random(height)), SharedUtils.RandomBool(), getBiasedWarmLand());
             }
 
             for (int i = 0; i < centers.Length; i++)
             {
-                if (!(centers[i].biome == Biome.OCEAN))
+                if (!(centers[i].Biome == Biome.OCEAN))
                 {
-                    centers[i].biome = Biome.OCEAN;
-                    if (centers[i].pos.Y / height < (1 / (float)6) || centers[i].pos.Y / height > (5 / (float)6))
+                    centers[i].Biome = Biome.OCEAN;
+                    if (centers[i].Position.Y / height < (1 / (float)6) || centers[i].Position.Y / height > (5 / (float)6))
                     {
-                        centers[i].biome = Biome.TUNDRA;
+                        centers[i].Biome = Biome.TUNDRA;
                     }
                     else
                     {
-                        centers[i].biome = getRandomNotTundraOcean();
+                        centers[i].Biome = getRandomNotTundraOcean();
                     }
                 }
             }
@@ -82,10 +82,10 @@ namespace World_Generation_CS
 
             Center centerToUse;
             centerToUse = centers[0];
-            closestDist = SharedUtils.dist(p.pos.X, p.pos.Y, centers[0].pos.X, centers[0].pos.Y);
+            closestDist = SharedUtils.Distance(p.Position.X, p.Position.Y, centers[0].Position.X, centers[0].Position.Y);
             for (int i = 1; i < centers.Length; i++)
             {
-                distance = SharedUtils.dist(p.pos.X, p.pos.Y, centers[i].pos.X, centers[i].pos.Y);
+                distance = SharedUtils.Distance(p.Position.X, p.Position.Y, centers[i].Position.X, centers[i].Position.Y);
                 if (distance < closestDist)
                 {
                     closestDist = distance;
@@ -121,27 +121,27 @@ namespace World_Generation_CS
         void renderPlot(Plot p)
         {
             // render the plot bkd
-            image.Mutate(context => context.Fill(p.c, new Rectangle((int)p.pos.X, (int)p.pos.Y, p.size, p.size)));
+            image.Mutate(context => context.Fill(p.Color, new Rectangle((int)p.Position.X, (int)p.Position.Y, p.Size, p.Size)));
 
             // if the plot has a structure
-            if (p.s != null)
+            if (p.Structure != null)
             {
                 // render the structure
                 // render p.s
-                renderStructure(p.s);
+                renderStructure(p.Structure);
             }
         }
 
         void renderStructure(Structure s)
         {
-            var p = s.p;
+            var p = s.Plot;
 
-            if (s.type == BuildingType.TREE)
+            if (s.BuildingType == BuildingType.TREE)
             {
-                image.Mutate(context => context.Fill(SharedUtils.color(139, 69, 19), new Rectangle((int)p.pos.X, (int)p.pos.Y, p.size, p.size)));
-                image.Mutate(context => context.Fill(SharedUtils.color(139, 69, 19), new EllipsePolygon(new Point((int)p.pos.X, (int)p.pos.Y), p.size)));
+                image.Mutate(context => context.Fill(SharedUtils.Color(139, 69, 19), new Rectangle((int)p.Position.X, (int)p.Position.Y, p.Size, p.Size)));
+                image.Mutate(context => context.Fill(SharedUtils.Color(139, 69, 19), new EllipsePolygon(new Point((int)p.Position.X, (int)p.Position.Y), p.Size)));
             }
-            else if (s.type == BuildingType.SNOW)
+            else if (s.BuildingType == BuildingType.SNOW)
             {
 
             }
@@ -149,7 +149,7 @@ namespace World_Generation_CS
 
         Biome getRandomBiome()
         {
-            int randomVal = (int)Math.Floor(SharedUtils.random(4.9999f));
+            int randomVal = (int)Math.Floor(SharedUtils.Random(4.9999f));
             if (randomVal == 0)
             {
                 return Biome.FOREST;
@@ -174,7 +174,7 @@ namespace World_Generation_CS
 
         Biome getRandomNotTundra()
         {
-            int randomVal = (int)Math.Floor(SharedUtils.random(4.9999f));
+            int randomVal = (int)Math.Floor(SharedUtils.Random(4.9999f));
             if (randomVal == 0)
             {
                 return Biome.FOREST;
@@ -195,7 +195,7 @@ namespace World_Generation_CS
 
         Biome getRandomNotTundraOcean()
         {
-            int randomVal = (int)Math.Floor(SharedUtils.random(2.9999f));
+            int randomVal = (int)Math.Floor(SharedUtils.Random(2.9999f));
             if (randomVal == 0)
             {
                 return Biome.FOREST;
@@ -212,7 +212,7 @@ namespace World_Generation_CS
 
         Biome getBiasedWarmLand()
         {
-            int randomVal = (int)Math.Floor(SharedUtils.random(3.4999f));
+            int randomVal = (int)Math.Floor(SharedUtils.Random(3.4999f));
             if (randomVal == 0)
             {
                 return Biome.FOREST;
