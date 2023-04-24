@@ -11,135 +11,135 @@ namespace World_Generation_CS
 {
     public class WorldGeneration
     {
-        int plotSize = 10;
-        int numberOfRows;
-        int numberOfColumns;
-        Plot[][] plots;
-        Center[] centers;
-        int numberOfCenters = 2500;
+        public int PlotSize = 10;
+        public int NumberOfRows;
+        public int NumberOfColumns;
+        public Plot[][] Plots;
+        public Center[] Centers;
+        public int NumberOfCenters = 2500;
 
-        const float width = 640;
-        const float height = 360;
+        public const float Width = 640;
+        public const float Height = 360;
 
-        Image<Rgba32> image = new Image<Rgba32>((int)width, (int)height);
+        public Image<Rgba32> Image = new Image<Rgba32>((int)Width, (int)Height);
 
-        public void setup()
+        public void Setup()
         {
-            numberOfRows = (int)Math.Floor(width / plotSize);
-            numberOfColumns = (int)Math.Floor(height / plotSize);
-            plots = new Plot[numberOfRows][];
-            for (int i = 0; i < numberOfRows; i++)
+            NumberOfRows = (int)Math.Floor(Width / PlotSize);
+            NumberOfColumns = (int)Math.Floor(Height / PlotSize);
+            Plots = new Plot[NumberOfRows][];
+            for (int i = 0; i < NumberOfRows; i++)
             {
-                plots[i] = new Plot[numberOfColumns];
+                Plots[i] = new Plot[NumberOfColumns];
             }
-            centers = new Center[numberOfCenters];
+            Centers = new Center[NumberOfCenters];
 
-            initPlots();
-            initCenters();
+            InitializePlots();
+            InitializeCenters();
 
-            updatePlots();
-            drawPlots();
+            UpdatePlots();
+            RenderPlots();
         }
 
-        void initPlots()
+        private void InitializePlots()
         {
-            for (int i = 0; i < numberOfRows; i++)
+            for (int i = 0; i < NumberOfRows; i++)
             {
-                for (int j = 0; j < numberOfColumns; j++)
+                for (int j = 0; j < NumberOfColumns; j++)
                 {
-                    plots[i][j] = new Plot(new Vector2(plotSize * i, plotSize * j), plotSize, SharedUtils.Color(0, 0, 0));
+                    Plots[i][j] = new Plot(new Vector2(PlotSize * i, PlotSize * j), PlotSize, SharedUtils.Color(0, 0, 0));
                 }
             }
         }
 
-        void initCenters()
+        private void InitializeCenters()
         {
-            for (int i = 0; i < centers.Length; i++)
+            for (int i = 0; i < Centers.Length; i++)
             {
-                centers[i] = new Center(new Vector2(SharedUtils.Random(width), SharedUtils.Random(height)), SharedUtils.RandomBool(), getBiasedWarmLand());
+                Centers[i] = new Center(new Vector2(SharedUtils.Random(Width), SharedUtils.Random(Height)), SharedUtils.RandomBool(), GetBiasedWarmLand());
             }
 
-            for (int i = 0; i < centers.Length; i++)
+            for (int i = 0; i < Centers.Length; i++)
             {
-                if (!(centers[i].Biome == Biome.OCEAN))
+                if (!(Centers[i].Biome == Biome.OCEAN))
                 {
-                    centers[i].Biome = Biome.OCEAN;
-                    if (centers[i].Position.Y / height < (1 / (float)6) || centers[i].Position.Y / height > (5 / (float)6))
+                    Centers[i].Biome = Biome.OCEAN;
+                    if (Centers[i].Position.Y / Height < (1 / (float)6) || Centers[i].Position.Y / Height > (5 / (float)6))
                     {
-                        centers[i].Biome = Biome.TUNDRA;
+                        Centers[i].Biome = Biome.TUNDRA;
                     }
                     else
                     {
-                        centers[i].Biome = getRandomNotTundraOcean();
+                        Centers[i].Biome = GetRandomNotTundraOcean();
                     }
                 }
             }
         }
 
-        void updatePlot(Plot p)
+        private void UpdatePlot(Plot p)
         {
             float distance, closestDist;
 
             Center centerToUse;
-            centerToUse = centers[0];
-            closestDist = SharedUtils.Distance(p.Position.X, p.Position.Y, centers[0].Position.X, centers[0].Position.Y);
-            for (int i = 1; i < centers.Length; i++)
+            centerToUse = Centers[0];
+            closestDist = SharedUtils.Distance(p.Position.X, p.Position.Y, Centers[0].Position.X, Centers[0].Position.Y);
+            for (int i = 1; i < Centers.Length; i++)
             {
-                distance = SharedUtils.Distance(p.Position.X, p.Position.Y, centers[i].Position.X, centers[i].Position.Y);
+                distance = SharedUtils.Distance(p.Position.X, p.Position.Y, Centers[i].Position.X, Centers[i].Position.Y);
                 if (distance < closestDist)
                 {
                     closestDist = distance;
-                    centerToUse = centers[i];
+                    centerToUse = Centers[i];
                 }
             }
 
-            p.updateColor(centerToUse, closestDist);
+            p.UpdateColor(centerToUse, closestDist);
         }
 
-        void updatePlots()
+        private void UpdatePlots()
         {
-            for (int i = 0; i < numberOfRows; i++)
+            for (int i = 0; i < NumberOfRows; i++)
             {
-                for (int j = 0; j < numberOfColumns; j++)
+                for (int j = 0; j < NumberOfColumns; j++)
                 {
-                    updatePlot(plots[i][j]);
+                    UpdatePlot(Plots[i][j]);
                 }
             }
         }
 
-        void drawPlots()
+        private void RenderPlots()
         {
-            for (int i = 0; i < numberOfRows; i++)
+            for (int i = 0; i < NumberOfRows; i++)
             {
-                for (int j = 0; j < numberOfColumns; j++)
+                for (int j = 0; j < NumberOfColumns; j++)
                 {
-                    renderPlot(plots[i][j]);
+                    RenderPlot(Plots[i][j]);
                 }
             }
         }
 
-        void renderPlot(Plot p)
+        private void RenderPlot(Plot p)
         {
             // render the plot bkd
-            image.Mutate(context => context.Fill(p.Color, new Rectangle((int)p.Position.X, (int)p.Position.Y, p.Size, p.Size)));
+            Image.Mutate(context => context.Fill(p.Color, new Rectangle((int)p.Position.X, (int)p.Position.Y, p.Size, p.Size)));
 
             // if the plot has a structure
             if (p.Structure != null)
             {
                 // render the structure
                 // render p.s
-                renderStructure(p.Structure);
+                RenderStructure(p.Structure);
             }
         }
 
-        void renderStructure(Structure s)
+        private void RenderStructure(Structure s)
         {
             var p = s.Plot;
 
             if (s.BuildingType == BuildingType.TREE)
             {
-                image.Mutate(context => context.Fill(SharedUtils.Color(139, 69, 19), new Rectangle((int)p.Position.X, (int)p.Position.Y, p.Size, p.Size)));
-                image.Mutate(context => context.Fill(SharedUtils.Color(139, 69, 19), new EllipsePolygon(new Point((int)p.Position.X, (int)p.Position.Y), p.Size)));
+                Image.Mutate(context => context.Fill(SharedUtils.Color(139, 69, 19), new Rectangle((int)p.Position.X, (int)p.Position.Y, p.Size, p.Size)));
+                Image.Mutate(context => context.Fill(SharedUtils.Color(139, 69, 19), new EllipsePolygon(new Point((int)p.Position.X, (int)p.Position.Y), p.Size)));
             }
             else if (s.BuildingType == BuildingType.SNOW)
             {
@@ -147,7 +147,7 @@ namespace World_Generation_CS
             }
         }
 
-        Biome getRandomBiome()
+        private Biome GetRandomBiome()
         {
             int randomVal = (int)Math.Floor(SharedUtils.Random(4.9999f));
             if (randomVal == 0)
@@ -172,7 +172,7 @@ namespace World_Generation_CS
             }
         }
 
-        Biome getRandomNotTundra()
+        private Biome GetRandomNotTundra()
         {
             int randomVal = (int)Math.Floor(SharedUtils.Random(4.9999f));
             if (randomVal == 0)
@@ -193,7 +193,7 @@ namespace World_Generation_CS
             }
         }
 
-        Biome getRandomNotTundraOcean()
+        private Biome GetRandomNotTundraOcean()
         {
             int randomVal = (int)Math.Floor(SharedUtils.Random(2.9999f));
             if (randomVal == 0)
@@ -210,7 +210,7 @@ namespace World_Generation_CS
             }
         }
 
-        Biome getBiasedWarmLand()
+        private Biome GetBiasedWarmLand()
         {
             int randomVal = (int)Math.Floor(SharedUtils.Random(3.4999f));
             if (randomVal == 0)
@@ -231,10 +231,9 @@ namespace World_Generation_CS
             }
         }
 
-        public Image render()
+        public Image Render()
         {
-            // TODO return image
-            return null;
+            return Image;
         }
     }
 }

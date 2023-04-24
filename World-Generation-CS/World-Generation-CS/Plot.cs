@@ -10,21 +10,21 @@ namespace World_Generation_CS
         public Color Color { get; set; }
         public Structure Structure { get; set; }
 
-        public Plot(Vector2 pos, int size, Color c)
+        public Plot(Vector2 position, int size, Color color)
         {
-            this.Position = pos;
+            this.Position = position;
             this.Size = size;
-            this.Color = c;
+            this.Color = color;
         }
 
-        public void updateColor(Center centerToUse, float d)
+        public void UpdateColor(Center centerToUse, float distance)
         {
             //d = 1/d; 
             this.Structure = null;
 
             if (centerToUse.Biome == Biome.PLAINS)
             {
-                if (d < 32)
+                if (distance < 32)
                 {
                     Color = SharedUtils.Color(153, 255, 51);
                 }
@@ -37,11 +37,11 @@ namespace World_Generation_CS
             if (centerToUse.Biome == Biome.TUNDRA)
             {
 
-                if (d < 16)
+                if (distance < 16)
                 {
                     Color = SharedUtils.Color(255, 255, 255);
                 }
-                else if (d < 32)
+                else if (distance < 32)
                 {
                     Color = SharedUtils.Color(102, 178, 255);
                     this.Structure = new Structure(BuildingType.SNOW, this);
@@ -55,7 +55,7 @@ namespace World_Generation_CS
 
             if (centerToUse.Biome == Biome.FOREST)
             {
-                if (d < 32)
+                if (distance < 32)
                 {
                     Color = SharedUtils.Color(0, 133, 0);
                 }
@@ -76,7 +76,7 @@ namespace World_Generation_CS
 
             if (centerToUse.Biome == Biome.DESERT)
             {
-                if (d < 32)
+                if (distance < 32)
                 {
                     Color = SharedUtils.Color(200, 180, 71);
                 }

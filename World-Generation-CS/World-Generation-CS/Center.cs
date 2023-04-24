@@ -8,9 +8,9 @@ namespace World_Generation_CS
         public Biome Biome { get; set; }
         public bool IsPopulated { get; set; }
 
-        public Center(Vector2 pos, bool isPopulated, Biome biome)
+        public Center(Vector2 position, bool isPopulated, Biome biome)
         {
-            this.Position = pos;
+            this.Position = position;
             this.IsPopulated = isPopulated;
             this.Biome = biome;
         }
