@@ -5,8 +5,6 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System.Numerics;
 
-// import toxi.math.noise.SimplexNoise;
-
 namespace World_Generation_CS
 {
     public class WorldGeneration
@@ -93,7 +91,81 @@ namespace World_Generation_CS
                 }
             }
 
-            p.UpdateColor(centerToUse, closestDist);
+            UpdateColor(p, centerToUse, closestDist);
+        }
+
+        public void UpdateColor(Plot p, Center centerToUse, float distance)
+        {
+            //d = 1/d; 
+            p.Structure = null;
+
+            int coreDist0 = 20;
+            int coreDist1 = 40;
+
+            if (centerToUse.Biome == Biome.PLAINS)
+            {
+                if (distance < coreDist1)
+                {
+                    p.Color = SharedUtils.Color(153, 255, 51);
+                }
+                else
+                {
+                    p.Color = SharedUtils.Color(0, 255, 0);
+                }
+            }
+
+            if (centerToUse.Biome == Biome.TUNDRA)
+            {
+
+                if (distance < coreDist0)
+                {
+                    p.Color = SharedUtils.Color(255, 255, 255);
+                }
+                else if (distance < coreDist1)
+                {
+                    p.Color = SharedUtils.Color(102, 178, 255);
+                    p.Structure = new Structure(BuildingType.SNOW, p);
+                }
+                else
+                {
+                    p.Color = SharedUtils.Color(102, 178, 255);
+                }
+
+            }
+
+            if (centerToUse.Biome == Biome.FOREST)
+            {
+                if (distance < coreDist1)
+                {
+                    p.Color = SharedUtils.Color(0, 133, 0);
+                }
+                else
+                {
+                    p.Color = SharedUtils.Color(0, 155, 0);
+                }
+
+                if (SharedUtils.Random(1) > 0.5)
+                {
+                    p.Structure = new Structure(BuildingType.TREE, p);
+                }
+            }
+
+            if (centerToUse.Biome == Biome.OCEAN)
+            {
+                p.Color = SharedUtils.Color(0, 0, 255);
+            }
+
+            if (centerToUse.Biome == Biome.DESERT)
+            {
+                if (distance < coreDist1)
+                {
+                    p.Color = SharedUtils.Color(200, 180, 71);
+                }
+                else
+                {
+                    p.Color = SharedUtils.Color(229, 211, 101);
+                }
+            }
         }
 
         private void UpdatePlots()
