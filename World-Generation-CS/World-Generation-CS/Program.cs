@@ -6,7 +6,7 @@ namespace World_Generation_CS
     {
         public static void Main(string[] args)
         {
-            WorldGeneration worldGeneration = new WorldGeneration();
+            WorldGeneration worldGeneration = new WorldGeneration(10, 2000, 1920, 1080);
 
             Image image = worldGeneration.Render();
             string filePath = "./" + Path.GetRandomFileName().Replace(".", "") + ".png";
