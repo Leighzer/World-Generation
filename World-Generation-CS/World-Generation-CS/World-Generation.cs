@@ -4,6 +4,7 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System.Numerics;
+using System.Security.Cryptography;
 
 namespace World_Generation_CS
 {
@@ -11,8 +12,8 @@ namespace World_Generation_CS
     {
         private int _plotSize { get; set; }
         private int _numberOfCenters { get; set; }
-        public int _width { get; set; }
-        public int _height { get; set; }
+        private int _width { get; set; }
+        private int _height { get; set; }
 
         private int _numberOfRows { get; set; }
         private int _numberOfColumns { get; set; }
@@ -20,8 +21,13 @@ namespace World_Generation_CS
         private List<Center> _centers { get; set; }
         private Image<Rgba32> _image { get; set; }
 
-        public WorldGeneration(int plotSize, int numberOfCenters, int width, int height)
+        private int _seed { get; set; }
+        private Random _random { get; set; }
+
+        public WorldGeneration(int plotSize, int numberOfCenters, int width, int height, int? seed = null)
         {
+            InitializeSeedAndRng(seed);
+
             _plotSize = plotSize;
             _numberOfCenters = numberOfCenters;
             _width = width;
@@ -38,9 +44,34 @@ namespace World_Generation_CS
             _image = new Image<Rgba32>(_width, _height);
         }
 
+        // null for a random seed
+        public void SetSeed(int? seed)
+        {
+            InitializeSeedAndRng(seed);
+        }
+
+        private void InitializeSeedAndRng(int? seed)
+        {
+            if (seed == null)
+            {
+                byte[] bytes = new byte[4];
+                RandomNumberGenerator.Fill(bytes);
+                seed = BitConverter.ToInt32(bytes);
+            }
+
+            _seed = seed.Value;
+            _random = new Random(_seed);
+        }
+
         public void GenerateWorld()
         {
-            Clear();
+            // if we have generated before
+            if (_centers.Any())
+            {
+                Clear();
+                // reset rng back to start
+                InitializeSeedAndRng(_seed);
+            }
 
             InitializePlots();
             InitializeCenters();
@@ -49,7 +80,7 @@ namespace World_Generation_CS
         }
 
         private void Clear()
-        {
+        {   
             _plots = new List<List<Plot>>();
             for (int i = 0; i < _numberOfRows; i++)
             {
@@ -330,6 +361,7 @@ namespace World_Generation_CS
             }
         }
 
+        // render world state to Image and return it
         public Image Render()
         {
             RenderPlots();
@@ -337,9 +369,8 @@ namespace World_Generation_CS
         }
 
         private float Random(float input)
-        {
-            Random random = new Random();
-            return (float)(random.NextDouble() * input);
+        {   
+            return (float)(_random.NextDouble() * input);
         }
 
         private bool RandomBool()
