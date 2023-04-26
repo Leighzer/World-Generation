@@ -38,13 +38,24 @@ namespace World_Generation_CS
             _image = new Image<Rgba32>(_width, _height);
         }
 
-        private void GenerateWorld()
+        public void GenerateWorld()
         {
+            Clear();
+
             InitializePlots();
             InitializeCenters();
 
             UpdatePlots();
-            RenderPlots();
+        }
+
+        private void Clear()
+        {
+            _plots = new List<List<Plot>>();
+            for (int i = 0; i < _numberOfRows; i++)
+            {
+                _plots.Add(new List<Plot>());
+            }
+            _centers = new List<Center>();
         }
 
         private void InitializePlots()
@@ -321,7 +332,7 @@ namespace World_Generation_CS
 
         public Image Render()
         {
-            GenerateWorld();
+            RenderPlots();
             return _image;
         }
 

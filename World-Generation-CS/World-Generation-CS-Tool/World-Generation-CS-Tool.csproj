@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>World_Generation_CS_Tool</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\World-Generation-CS\World-Generation-CS.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SixLabors.ImageSharp">
+      <HintPath>..\World-Generation-CS\lib\SixLabors.ImageSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="SixLabors.ImageSharp.Drawing">
+      <HintPath>..\World-Generation-CS\lib\SixLabors.ImageSharp.Drawing.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
