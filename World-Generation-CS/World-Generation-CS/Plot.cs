@@ -8,7 +8,7 @@ namespace World_Generation_CS
         public Vector2 Position { get; set; }
         public int Size { get; set; }
         public Color Color { get; set; }
-        public Structure Structure { get; set; }
+        public Structure? Structure { get; set; }
 
         public Plot(Vector2 position, int size, Color color)
         {
