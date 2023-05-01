@@ -1,7 +1,16 @@
-﻿using SixLabors.ImageSharp;
+﻿using Microsoft.Extensions.Configuration;
+using SixLabors.ImageSharp;
 using World_Generation_CS;
 
-WorldGeneration worldGeneration = new WorldGeneration(10, 2000, 1920, 1080, 5);
+IConfiguration configuration = new ConfigurationBuilder().AddCommandLine(args).Build();
+
+int? randomSeed = configuration.GetValue<int?>("randomSeed");
+int plotSize = configuration.GetValue<int?>("plotSize") ?? 10;
+int numberOfCenters = configuration.GetValue<int?>("numberOfCenters") ?? 2000;
+int width = configuration.GetValue<int?>("width") ?? 1920;
+int height = configuration.GetValue<int?>("height") ?? 1080;
+
+WorldGeneration worldGeneration = new WorldGeneration(plotSize, numberOfCenters, width, height, randomSeed);
 worldGeneration.GenerateWorld();
 Image image = worldGeneration.Render();
 string filePath = "./" + Path.GetRandomFileName().Replace(".", "") + ".png";
