@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using SixLabors.ImageSharp;
+using System.Diagnostics;
 using World_Generation_CS;
 
+Stopwatch stopwatch = Stopwatch.StartNew();
 IConfiguration configuration = new ConfigurationBuilder().AddCommandLine(args).Build();
 
 int? randomSeed = configuration.GetValue<int?>("randomSeed");
@@ -17,7 +19,7 @@ string filePath = "./" + Path.GetRandomFileName().Replace(".", "") + ".png";
 image.SaveAsPng(filePath);
 
 Console.WriteLine(Path.GetFullPath(filePath));
-Console.WriteLine("DONE");
+Console.WriteLine($"DONE in {stopwatch.ElapsedMilliseconds}ms");
 
 // to test if program is deterministic based on seeds
 //worldGeneration.GenerateWorld();
