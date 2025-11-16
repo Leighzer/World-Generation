@@ -3,6 +3,7 @@ using SkiaSharp;
 using System.Diagnostics;
 using World_Generation_CS;
 
+Stopwatch stopwatch = Stopwatch.StartNew();
 IConfiguration configuration = new ConfigurationBuilder().AddCommandLine(args).Build();
 
 int? randomSeed = configuration.GetValue<int?>("randomSeed");
@@ -11,7 +12,6 @@ int numberOfCenters = configuration.GetValue<int?>("numberOfCenters") ?? 2000;
 int width = configuration.GetValue<int?>("width") ?? 1920;
 int height = configuration.GetValue<int?>("height") ?? 1080;
 
-var stopwatch = Stopwatch.StartNew();
 WorldGeneration worldGeneration = new WorldGeneration(plotSize, numberOfCenters, width, height, randomSeed);
 worldGeneration.GenerateWorld();
 SKBitmap bitmap = worldGeneration.Render();
