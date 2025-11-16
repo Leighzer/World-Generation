@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
-using SixLabors.ImageSharp;
+using SkiaSharp;
+using System.Diagnostics;
 using World_Generation_CS;
 
 IConfiguration configuration = new ConfigurationBuilder().AddCommandLine(args).Build();
@@ -10,14 +11,18 @@ int numberOfCenters = configuration.GetValue<int?>("numberOfCenters") ?? 2000;
 int width = configuration.GetValue<int?>("width") ?? 1920;
 int height = configuration.GetValue<int?>("height") ?? 1080;
 
+var stopwatch = Stopwatch.StartNew();
 WorldGeneration worldGeneration = new WorldGeneration(plotSize, numberOfCenters, width, height, randomSeed);
 worldGeneration.GenerateWorld();
-Image image = worldGeneration.Render();
+SKBitmap bitmap = worldGeneration.Render();
+using var image = SKImage.FromBitmap(bitmap);
+using var data = image.Encode(SKEncodedImageFormat.Png, 100); // 100 = quality
 string filePath = "./" + Path.GetRandomFileName().Replace(".", "") + ".png";
-image.SaveAsPng(filePath);
+using var stream = File.OpenWrite(filePath);
+data.SaveTo(stream);
 
 Console.WriteLine(Path.GetFullPath(filePath));
-Console.WriteLine("DONE");
+Console.WriteLine($"DONE in {stopwatch.ElapsedMilliseconds}ms");
 
 // to test if program is deterministic based on seeds
 //worldGeneration.GenerateWorld();

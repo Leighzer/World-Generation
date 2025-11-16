@@ -1,4 +1,4 @@
-﻿using SixLabors.ImageSharp;
+﻿using SkiaSharp;
 using System.Numerics;
 
 namespace World_Generation_CS
@@ -7,10 +7,10 @@ namespace World_Generation_CS
     {
         public Vector2 Position { get; set; }
         public int Size { get; set; }
-        public Color Color { get; set; }
+        public SKColor Color { get; set; }
         public Structure? Structure { get; set; }
 
-        public Plot(Vector2 position, int size, Color color)
+        public Plot(Vector2 position, int size, SKColor color)
         {
             this.Position = position;
             this.Size = size;

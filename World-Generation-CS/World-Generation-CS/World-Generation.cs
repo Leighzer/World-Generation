@@ -1,8 +1,4 @@
-﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+﻿using SkiaSharp;
 using System.Numerics;
 using System.Security.Cryptography;
 
@@ -19,7 +15,7 @@ namespace World_Generation_CS
         private int _numberOfColumns { get; set; }
         private List<List<Plot>> _plots { get; set; }
         private List<Center> _centers { get; set; }
-        private Image<Rgba32> _image { get; set; }
+        private SKBitmap _bitmap { get; set; }
 
         private int _seed { get; set; }
         private Random _random { get; set; }
@@ -41,7 +37,7 @@ namespace World_Generation_CS
                 _plots.Add(new List<Plot>());
             }
             _centers = new List<Center>();
-            _image = new Image<Rgba32>(_width, _height);
+            _bitmap = new SKBitmap(_width, _height, SKColorType.Rgba8888, SKAlphaType.Premul);
         }
 
         // null for a random seed
@@ -80,7 +76,7 @@ namespace World_Generation_CS
         }
 
         private void Clear()
-        {   
+        {
             _plots = new List<List<Plot>>();
             for (int i = 0; i < _numberOfRows; i++)
             {
@@ -95,7 +91,7 @@ namespace World_Generation_CS
             {
                 for (int j = 0; j < _numberOfColumns; j++)
                 {
-                    _plots[i].Add(new Plot(new Vector2(_plotSize * i, _plotSize * j), _plotSize, Color.FromRgb(0, 0, 0)));
+                    _plots[i].Add(new Plot(new Vector2(_plotSize * i, _plotSize * j), _plotSize, new SKColor(0, 0, 0)));
                 }
             }
         }
@@ -156,11 +152,11 @@ namespace World_Generation_CS
             {
                 if (distance < coreDist1)
                 {
-                    p.Color = Color.FromRgb(153, 255, 51);
+                    p.Color = new SKColor(153, 255, 51);
                 }
                 else
                 {
-                    p.Color = Color.FromRgb(0, 255, 0);
+                    p.Color = new SKColor(0, 255, 0);
                 }
             }
 
@@ -169,16 +165,16 @@ namespace World_Generation_CS
 
                 if (distance < coreDist0)
                 {
-                    p.Color = Color.FromRgb(255, 255, 255);
+                    p.Color = new SKColor(255, 255, 255);
                 }
                 else if (distance < coreDist1)
                 {
-                    p.Color = Color.FromRgb(102, 178, 255);
+                    p.Color = new SKColor(102, 178, 255);
                     p.Structure = new Structure(BuildingType.SNOW, p);
                 }
                 else
                 {
-                    p.Color = Color.FromRgb(102, 178, 255);
+                    p.Color = new SKColor(102, 178, 255);
                 }
 
             }
@@ -187,11 +183,11 @@ namespace World_Generation_CS
             {
                 if (distance < coreDist1)
                 {
-                    p.Color = Color.FromRgb(0, 133, 0);
+                    p.Color = new SKColor(0, 133, 0);
                 }
                 else
                 {
-                    p.Color = Color.FromRgb(0, 155, 0);
+                    p.Color = new SKColor(0, 155, 0);
                 }
 
                 if (Random(1) > 0.5)
@@ -202,18 +198,18 @@ namespace World_Generation_CS
 
             if (centerToUse.Biome == Biome.OCEAN)
             {
-                p.Color = Color.FromRgb(0, 0, 255);
+                p.Color = new SKColor(0, 0, 255);
             }
 
             if (centerToUse.Biome == Biome.DESERT)
             {
                 if (distance < coreDist1)
                 {
-                    p.Color = Color.FromRgb(200, 180, 71);
+                    p.Color = new SKColor(200, 180, 71);
                 }
                 else
                 {
-                    p.Color = Color.FromRgb(229, 211, 101);
+                    p.Color = new SKColor(229, 211, 101);
                 }
             }
         }
@@ -231,37 +227,75 @@ namespace World_Generation_CS
 
         private void RenderPlots()
         {
+            using var canvas = new SKCanvas(_bitmap);   // ✔ only once
+
+            canvas.Clear(SKColors.Black);
+
             for (int i = 0; i < _numberOfRows; i++)
             {
                 for (int j = 0; j < _numberOfColumns; j++)
                 {
-                    RenderPlot(_plots[i][j]);
+                    RenderPlot(_plots[i][j], canvas);
                 }
             }
         }
 
-        private void RenderPlot(Plot p)
+        private void RenderPlot(Plot p, SKCanvas canvas)
         {
             // render the plot bkd
-            _image.Mutate(context => context.Fill(p.Color, new Rectangle((int)p.Position.X, (int)p.Position.Y, p.Size, p.Size)));
+            using var paint = new SKPaint
+            {
+                Color = p.Color,
+                Style = SKPaintStyle.Fill,
+                IsAntialias = false
+            };
+            var rect = new SKRect(
+                p.Position.X,
+                p.Position.Y,
+                p.Position.X + p.Size,
+                p.Position.Y + p.Size
+            );
+            canvas.DrawRect(rect, paint);
 
             // if the plot has a structure
             if (p.Structure != null)
             {
                 // render the structure
                 // render p.s
-                RenderStructure(p.Structure);
+                RenderStructure(p.Structure, canvas);
             }
         }
 
-        private void RenderStructure(Structure structure)
+        private void RenderStructure(Structure structure, SKCanvas canvas)
         {
             var plot = structure.Plot;
 
             if (structure.BuildingType == BuildingType.TREE)
             {
-                _image.Mutate(context => context.Fill(Color.FromRgb(139, 69, 19), new Rectangle((int)plot.Position.X, (int)plot.Position.Y, plot.Size, plot.Size)));
-                _image.Mutate(context => context.Fill(Color.FromRgb(77, 255, 58), new EllipsePolygon(new Point((int)plot.Position.X + (plot.Size / 2), (int)plot.Position.Y + (plot.Size / 2)), plot.Size / 2)));
+                using var paint = new SKPaint
+                {
+                    Color = new SKColor(139, 69, 19),
+                    Style = SKPaintStyle.Fill,
+                    IsAntialias = false
+                };
+                var rect = new SKRect(
+                    (float)plot.Position.X,
+                    (float)plot.Position.Y,
+                    (float)plot.Position.X + plot.Size,
+                    (float)plot.Position.Y + plot.Size
+                );
+                canvas.DrawRect(rect, paint);
+
+                using var paint2 = new SKPaint
+                {
+                    Color = new SKColor(77, 255, 58),
+                    Style = SKPaintStyle.Fill,
+                    IsAntialias = true
+                };
+                float centerX = (float)plot.Position.X + (plot.Size / 2f);
+                float centerY = (float)plot.Position.Y + (plot.Size / 2f);
+                float radius = plot.Size / 2f;
+                canvas.DrawCircle(centerX, centerY, radius, paint2);
             }
             else if (structure.BuildingType == BuildingType.SNOW)
             {
@@ -271,7 +305,8 @@ namespace World_Generation_CS
                     {
                         int tx = (int)plot.Position.X + i;
                         int ty = (int)plot.Position.Y + j;
-                        _image[tx, ty] = RandomBool() ? Color.White : plot.Color;
+                        var randomColor = RandomBool() ? SKColors.White : plot.Color;
+                        _bitmap.SetPixel(tx, ty, randomColor);
                     }
                 }
             }
@@ -362,14 +397,14 @@ namespace World_Generation_CS
         }
 
         // render world state to Image and return it
-        public Image Render()
+        public SKBitmap Render()
         {
             RenderPlots();
-            return _image;
+            return _bitmap;
         }
 
         private float Random(float input)
-        {   
+        {
             return (float)(_random.NextDouble() * input);
         }
 
